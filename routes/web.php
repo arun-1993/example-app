@@ -48,3 +48,10 @@ Route::get('/post', function () use ($posts) {
 Route::get('/recent-posts/{days_ago?}', function ($daysago = 20) {
     return "<h1>Posts from $daysago days ago</h1>";
 })->name('post.recent');
+
+Route::get('/fun/responses', function () use ($posts) {
+    return response($posts, 201)
+        ->header('Content-type', 'application/json')
+        ->cookie('MY_COOKIE', 'Arun Ravindran', 3600)
+    ;
+});
