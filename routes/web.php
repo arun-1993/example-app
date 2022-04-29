@@ -1,5 +1,8 @@
 <?php
 
+use App\Http\Controllers\AboutController;
+use App\Http\Controllers\HomeController;
+use App\Http\Controllers\PostController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -27,31 +30,63 @@ $posts = [
     ],
 ];
 
-Route::view('/', 'home.index')->name('home.index');
+Route::get('/', [HomeController::class, 'home'])->name('home.index');
 
-Route::view('/contact', 'home.contact')->name('home.contact');
+Route::get('/contact', [HomeController::class, 'contact'])->name('home.contact');
 
-Route::get('/post/{id}', function ($id) use ($posts) {
-    abort_if(!isset($posts[$id]), 404);
+Route::get('/single', AboutController::class);
 
-    return view('post.show', [
-        'post' => $posts[$id],
-    ]);
-})->name('post.single');
+Route::resource('post', PostController::class)->only(['index', 'show']);
 
-Route::get('/post', function () use ($posts) {
-    return view('post.index', [
-        'posts' => $posts,
-    ]);
-})->name('post.index');
+// Route::get('/post/{id}', function ($id) use ($posts) {
+//     abort_if(!isset($posts[$id]), 404);
 
-Route::get('/recent-posts/{days_ago?}', function ($daysago = 20) {
-    return "<h1>Posts from $daysago days ago</h1>";
-})->name('post.recent');
+//     return view('post.show', [
+//         'post' => $posts[$id],
+//     ]);
+// })->name('post.single');
 
-Route::get('/fun/responses', function () use ($posts) {
-    return response($posts, 201)
-        ->header('Content-type', 'application/json')
-        ->cookie('MY_COOKIE', 'Arun Ravindran', 3600)
-    ;
+// Route::get('/post', function () use ($posts) {
+//     // dd(request()->all());
+//     dd((int)request()->query('page', 1));
+//     return view('post.index', [
+//         'posts' => $posts,
+//     ]);
+// })->name('post.index');
+
+// Route::get('/recent-posts/{days_ago?}', function ($daysago = 20) {
+//     return "<h1>Posts from $daysago days ago</h1>";
+// })->name('post.recent');
+
+Route::prefix('/fun')->name('fun.')->group(function () use ($posts) {
+    Route::get('/response', function () use ($posts) {
+        return response($posts, 201)
+            ->header('Content-type', 'application/json')
+            ->cookie('MY_COOKIE', 'Arun Ravindran', 3600)
+        ;
+    })->name('response');
+    
+    Route::get('/redirect', function () {
+        return redirect('/contact');
+    })->name('redirect');
+    
+    Route::get('/back', function () {
+        return back();
+    })->name('back');
+    
+    Route::get('/named-route', function () {
+        return redirect()->route('post.single', ['id' => 1]);
+    })->name('named-route');
+    
+    Route::get('/away', function () {
+        return redirect()->away('https://www.google.com');
+    })->name('away');
+    
+    Route::get('/json', function () use ($posts) {
+        return response()->json($posts);
+    })->name('json');
+    
+    Route::get('/download', function () use ($posts) {
+        return response()->download(public_path('/fritz-cola.jpg'), 'drink.jpg');
+    })->name('download');
 });
