@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\StorePost;
 use App\Models\BlogPost;
 use Illuminate\Http\Request;
 
@@ -24,7 +25,7 @@ class PostController extends Controller
      */
     public function create()
     {
-        //
+        return view('post.create');
     }
 
     /**
@@ -33,9 +34,15 @@ class PostController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(StorePost $request)
     {
-        //
+        $validated = $request->validated();
+
+        $post = BlogPost::create($validated);
+
+        $request->session()->flash('status', 'Blog Post Created');
+
+        return redirect()->route('post.show', ['post' => $post->id]);
     }
 
     /**
@@ -46,9 +53,9 @@ class PostController extends Controller
      */
     public function show($id)
     {
-        abort_if(!isset($this->posts[$id]), 404);
+        // abort_if(!isset($this->posts[$id]), 404);
 
-        return view('post.show', ['post' => $this->posts[$id]]);
+        return view('post.show', ['post' => BlogPost::findOrFail($id)]);
     }
 
     /**
