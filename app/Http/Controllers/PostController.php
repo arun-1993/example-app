@@ -43,7 +43,9 @@ class PostController extends Controller
 
         $request->session()->flash('status', 'Blog Post Created!');
 
-        return redirect()->route('post.show', ['post' => $post->id]);
+        return redirect()->route('post.show', [
+            'post' => $post->id
+        ]);
     }
 
     /**
@@ -56,7 +58,9 @@ class PostController extends Controller
     {
         // abort_if(!isset($this->posts[$id]), 404);
 
-        return view('post.show', ['post' => BlogPost::findOrFail($id)]);
+        return view('post.show', [
+            'post' => BlogPost::with('comments')->findOrFail($id),
+        ]);
     }
 
     /**
@@ -67,7 +71,9 @@ class PostController extends Controller
      */
     public function edit($id)
     {
-        return view('post.edit', ['post' => BlogPost::findOrFail($id)]);
+        return view('post.edit', [
+            'post' => BlogPost::findOrFail($id)
+        ]);
     }
 
     /**
@@ -87,7 +93,9 @@ class PostController extends Controller
 
         $request->session()->flash('status', 'Blog Post Updated!');
         
-        return redirect()->route('post.show', ['post' => $post->id]);
+        return redirect()->route('post.show', [
+            'post' => $post->id
+        ]);
     }
 
     /**

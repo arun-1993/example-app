@@ -13,12 +13,14 @@ class PostTest extends TestCase
 
     private function create_dummy_blog_post()
     {
-        $post = new BlogPost();
-        $post->title = 'New Title';
-        $post->content = 'Content of the blog post';
-        $post->save();
+        // $post = new BlogPost();
+        // $post->title = 'New Title';
+        // $post->content = 'Content of the blog post';
+        // $post->save();
+        // return $post;
 
-        return $post;
+        return BlogPost::factory()->new_post()->create();
+
     }
 
     public function test_no_blog_post()
