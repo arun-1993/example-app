@@ -13,8 +13,17 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::table('blog_posts', function (Blueprint $table) {
-            $table->unsignedBigInteger('user_id');
+        Schema::table('blog_posts', function (Blueprint $table) 
+        {
+            if (env('DB_CONNECTION') === 'sqlite_testing')
+            {
+                $table->unsignedBigInteger('user_id')->default(0);
+            }
+
+            else
+            {
+                $table->unsignedBigInteger('user_id')->default(0);
+            }
             $table->foreign('user_id')->references('id')->on('users');
         });
     }
