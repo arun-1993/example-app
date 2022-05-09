@@ -13,14 +13,7 @@ class PostTest extends TestCase
 
     private function create_dummy_blog_post()
     {
-        // $post = new BlogPost();
-        // $post->title = 'New Title';
-        // $post->content = 'Content of the blog post';
-        // $post->save();
-        // return $post;
-
         return BlogPost::factory()->new_post()->create();
-
     }
 
     public function test_no_blog_post()
@@ -66,7 +59,8 @@ class PostTest extends TestCase
             'content' => 'Atleast 10 characters',
         ];
 
-        $this->post('/post', $params)
+        $this->actingAs($this->user())
+            ->post('/post', $params)
             ->assertStatus(302)
             ->assertSessionHas('status');
 
@@ -80,7 +74,8 @@ class PostTest extends TestCase
             'content' => 'x',
         ];
 
-        $this->post('/post', $params)
+        $this->actingAs($this->user())
+            ->post('/post', $params)
             ->assertStatus(302)
             ->assertSessionHas('errors');
 
@@ -101,7 +96,8 @@ class PostTest extends TestCase
             'content' => 'Content was changed',
         ];
 
-        $this->put("/post/{$post->id}", $params)
+        $this->actingAs($this->user())
+            ->put("/post/{$post->id}", $params)
             ->assertStatus(302)
             ->assertSessionHas('status');
 
@@ -119,7 +115,8 @@ class PostTest extends TestCase
 
         $this->assertDatabaseHas('blog_posts', $post->getAttributes());
 
-        $this->delete("/post/{$post->id}")
+        $this->actingAs($this->user())
+            ->delete("/post/{$post->id}")
             ->assertStatus(302)
             ->assertSessionHas('status');
 
