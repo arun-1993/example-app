@@ -121,6 +121,7 @@ class PostTest extends TestCase
             ->assertSessionHas('status');
 
         $this->assertEquals(session('status'), 'Blog Post Deleted!');
-        $this->assertDatabaseMissing('blog_posts', $post->getAttributes());
+        // $this->assertDatabaseMissing('blog_posts', $post->getAttributes());
+        $this->assertSoftDeleted('blog_posts', $post->getAttributes());
     }
 }

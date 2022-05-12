@@ -2,8 +2,6 @@
 
 namespace Database\Seeders;
 
-use App\Models\BlogPost;
-use App\Models\User;
 use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder
@@ -15,14 +13,15 @@ class DatabaseSeeder extends Seeder
      */
     public function run()
     {
-        // \App\Models\User::factory(10)->create();
-        $doe = User::factory()->new_user()->create();
-        $others = User::factory(20)->create();
-        $users = $others->concat([$doe]);
+        if ($this->command->confirm('Do you want to refresh the database?', true)) {
+            $this->command->call('migrate:refresh');
+            $this->command->info('Database was refreshed');
+        }
 
-        $posts = BlogPost::factory(50)->make()->each(function($post) use ($users) {
-            $post->user_id = $users->random()->id;
-            $post->save();
-        });
+        $this->call([
+            UsersTableSeeder::class,
+            BlogPostsTableSeeder::class,
+            CommentsTableSeeder::class,
+        ]);
     }
 }

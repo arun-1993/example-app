@@ -22,7 +22,7 @@ return new class extends Migration
 
             else
             {
-                $table->unsignedBigInteger('user_id')->default(0);
+                $table->unsignedBigInteger('user_id');
             }
             $table->foreign('user_id')->references('id')->on('users');
         });

@@ -24,7 +24,7 @@ class BlogPostFactory extends Factory
 
     public function new_post()
     {
-        return $this->state(function (array $attributes) {
+        return $this->state(function () {
             return [
                 'title' => 'New Title',
                 'content' => 'Content of the blog post',

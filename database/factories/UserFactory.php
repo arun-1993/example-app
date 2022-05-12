@@ -42,7 +42,7 @@ class UserFactory extends Factory
 
     public function new_user()
     {
-        return $this->state(function (array $attributes) {
+        return $this->state(function () {
             return [
                 'name' => 'John Doe',
                 'email' => 'john@laravel.test',
