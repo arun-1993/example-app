@@ -11,21 +11,21 @@ class PostTest extends TestCase
 {
     use RefreshDatabase;
 
-    private function create_dummy_blog_post()
+    private function createDummyBlogPost()
     {
         return BlogPost::factory()->new_post()->create();
     }
 
-    public function test_no_blog_post()
+    public function testNoBlogPost()
     {
         $response = $this->get('/post');
         $response->assertSeeText('No Posts Found!');
     }
 
-    public function test_see_one_post_with_no_comments()
+    public function testSeeOnePostWithNoComments()
     {
         // Arrange
-        $post = $this->create_dummy_blog_post();
+        $post = $this->createDummyBlogPost();
 
         // Act
         $response = $this->get('/post');
@@ -39,10 +39,10 @@ class PostTest extends TestCase
         ]);
     }
 
-    public function test_see_one_post_with_comments()
+    public function testSeeOnePostWithComments()
     {
         // Arrange
-        $post = $this->create_dummy_blog_post();
+        $post = $this->createDummyBlogPost();
         Comment::factory()->count(4)->create(['blog_post_id' => $post->id]);
 
         // Act
@@ -52,10 +52,10 @@ class PostTest extends TestCase
         $response->assertSeeText('4 Comments');
     }
 
-    public function test_store_valid()
+    public function testStoreValid()
     {
         $params = [
-            'title' => 'Valid title',
+            'title'   => 'Valid title',
             'content' => 'Atleast 10 characters',
         ];
 
@@ -67,10 +67,10 @@ class PostTest extends TestCase
         $this->assertEquals(session('status'), 'Blog Post Created!');
     }
 
-    public function test_store_fail()
+    public function testStoreFail()
     {
         $params = [
-            'title' => 'x',
+            'title'   => 'x',
             'content' => 'x',
         ];
 
@@ -80,19 +80,19 @@ class PostTest extends TestCase
             ->assertSessionHas('errors');
 
         $messages = session('errors')->getMessages();
-        
+
         $this->assertEquals($messages['title'][0], 'The title must be at least 5 characters.');
         $this->assertEquals($messages['content'][0], 'The content must be at least 10 characters.');
     }
 
-    public function test_update_valid()
+    public function testUpdateValid()
     {
-        $post = $this->create_dummy_blog_post();
+        $post = $this->createDummyBlogPost();
 
         $this->assertDatabaseHas('blog_posts', $post->getAttributes());
 
         $params = [
-            'title' => 'A new names title',
+            'title'   => 'A new names title',
             'content' => 'Content was changed',
         ];
 
@@ -104,14 +104,14 @@ class PostTest extends TestCase
         $this->assertEquals(session('status'), 'Blog Post Updated!');
         $this->assertDatabaseMissing('blog_posts', $post->getAttributes());
         $this->assertDatabaseHas('blog_posts', [
-            'title' => 'A new names title',
+            'title'   => 'A new names title',
             'content' => 'Content was changed',
         ]);
     }
 
-    public function test_delete()
+    public function testDelete()
     {
-        $post = $this->create_dummy_blog_post();
+        $post = $this->createDummyBlogPost();
 
         $this->assertDatabaseHas('blog_posts', $post->getAttributes());
 
