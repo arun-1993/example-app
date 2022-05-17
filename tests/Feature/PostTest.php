@@ -11,9 +11,11 @@ class PostTest extends TestCase
 {
     use RefreshDatabase;
 
-    private function createDummyBlogPost()
+    private function createDummyBlogPost($userId = null): BlogPost
     {
-        return BlogPost::factory()->new_post()->create();
+        return BlogPost::factory()->new_post()->create([
+            'user_id' => $userId ?? $this->user()->id,
+        ]);
     }
 
     public function testNoBlogPost()
@@ -87,16 +89,17 @@ class PostTest extends TestCase
 
     public function testUpdateValid()
     {
-        $post = $this->createDummyBlogPost();
-
+        $user = $this->user();
+        $post = $this->createDummyBlogPost($user->id);
+        
         $this->assertDatabaseHas('blog_posts', $post->getAttributes());
 
         $params = [
-            'title'   => 'A new names title',
+            'title'   => 'A new named title',
             'content' => 'Content was changed',
         ];
 
-        $this->actingAs($this->user())
+        $this->actingAs($user)
             ->put("/post/{$post->id}", $params)
             ->assertStatus(302)
             ->assertSessionHas('status');
@@ -104,18 +107,19 @@ class PostTest extends TestCase
         $this->assertEquals(session('status'), 'Blog Post Updated!');
         $this->assertDatabaseMissing('blog_posts', $post->getAttributes());
         $this->assertDatabaseHas('blog_posts', [
-            'title'   => 'A new names title',
+            'title'   => 'A new named title',
             'content' => 'Content was changed',
         ]);
     }
 
     public function testDelete()
     {
-        $post = $this->createDummyBlogPost();
+        $user = $this->user();
+        $post = $this->createDummyBlogPost($user->id);
 
         $this->assertDatabaseHas('blog_posts', $post->getAttributes());
 
-        $this->actingAs($this->user())
+        $this->actingAs($user)
             ->delete("/post/{$post->id}")
             ->assertStatus(302)
             ->assertSessionHas('status');

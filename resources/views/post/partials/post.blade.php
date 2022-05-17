@@ -16,10 +16,15 @@
 @endif
 
 <div class="mb-3">
-    <a class="btn btn-primary" href="{{ route('post.edit', ['post' => $post->id]) }}">Edit</a>
+    @can('update', $post)
+    <a class="btn btn-primary" href="{{ route('post.edit', ['post' => $post->id]) }}">Edit</a>    
+    @endcan
+    
+    @can('delete', $post)
     <form class="d-inline" action="{{ route('post.destroy', ['post' => $post->id]) }}" method="POST">
         @csrf
         @method('DELETE')
         <input class="btn btn-primary" type="submit" name="submit" value="Delete" />
     </form>
+    @endcan
 </div>
