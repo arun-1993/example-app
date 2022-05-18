@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\StorePost;
 use App\Models\BlogPost;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 
@@ -21,7 +22,10 @@ class PostController extends Controller
     public function index()
     {
         return view('post.index', [
-            'posts' => BlogPost::withCount('comments')->get(),
+            'posts' => BlogPost::newest()->withCount('comments')->get(),
+            'mostCommented' => BlogPost::mostCommented()->take(5)->get(),
+            'mostActive' => User::withMostBlogPosts()->take(5)->get(),
+            'mostActiveLastMonth' => User::withMostBlogPostsLastMonth()->take(5)->get(),
         ]);
     }
 
@@ -45,12 +49,13 @@ class PostController extends Controller
     public function store(StorePost $request)
     {
         $validated = $request->validated();
+        $validated['user_id'] = $request->user()->id;
         $post = BlogPost::create($validated);
 
         $request->session()->flash('status', 'Blog Post Created!');
 
         return redirect()->route('post.show', [
-            'post' => $post->id
+            'post' => $post->id,
         ]);
     }
 
@@ -63,6 +68,12 @@ class PostController extends Controller
     public function show($id)
     {
         // abort_if(!isset($this->posts[$id]), 404);
+
+        // return view('post.show', [
+        //     'post' => BlogPost::with(['comments' => function ($query) {
+        //         return $query->newest();
+        //     }])->findOrFail($id),
+        // ]);
 
         return view('post.show', [
             'post' => BlogPost::with('comments')->findOrFail($id),
@@ -130,10 +141,6 @@ class PostController extends Controller
         $post = BlogPost::findOrFail($id);
 
         $this->authorize('delete', $post);
-        // if(Gate::denies('delete-post', $post))
-        // {
-        //     abort(403, 'You Do Not Have The Permission To Delete This Blog Post');
-        // }
 
         $post->delete();
 
