@@ -5,8 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StorePost;
 use App\Models\BlogPost;
 use App\Models\User;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Cache;
 
 class PostController extends Controller
 {
@@ -21,11 +20,23 @@ class PostController extends Controller
      */
     public function index()
     {
+        $mostCommented = Cache::remember('blog-posts-most-commented', now()->addSeconds(10), function () {
+            return BlogPost::mostCommented()->take(5)->get();
+        });
+
+        $mostActive = Cache::remember('users-most-active', now()->addSeconds(10), function () {
+            return User::withMostBlogPosts()->take(5)->get();
+        });
+
+        $mostActiveLastMonth = Cache::remember('users-most-active-last-month', now()->addSeconds(10), function () {
+            return User::withMostBlogPostsLastMonth()->take(5)->get();
+        });
+
         return view('post.index', [
-            'posts' => BlogPost::newest()->withCount('comments')->get(),
-            'mostCommented' => BlogPost::mostCommented()->take(5)->get(),
-            'mostActive' => User::withMostBlogPosts()->take(5)->get(),
-            'mostActiveLastMonth' => User::withMostBlogPostsLastMonth()->take(5)->get(),
+            'posts'               => BlogPost::newest()->withCount('comments')->with('user')->get(),
+            'mostCommented'       => $mostCommented,
+            'mostActive'          => $mostActive,
+            'mostActiveLastMonth' => $mostActiveLastMonth,
         ]);
     }
 
@@ -48,9 +59,9 @@ class PostController extends Controller
      */
     public function store(StorePost $request)
     {
-        $validated = $request->validated();
+        $validated            = $request->validated();
         $validated['user_id'] = $request->user()->id;
-        $post = BlogPost::create($validated);
+        $post                 = BlogPost::create($validated);
 
         $request->session()->flash('status', 'Blog Post Created!');
 
@@ -75,8 +86,46 @@ class PostController extends Controller
         //     }])->findOrFail($id),
         // ]);
 
+        $blogPost = Cache::remember("blog-post-{$id}", 60, function () use ($id) {
+            return BlogPost::with('comments')->findOrFail($id);
+        });
+
+        $sessionId  = session()->getId();
+        $counterKey = "blog-post-{$id}-counter";
+        $usersKey   = "blog-post-{$id}-users";
+
+        $users       = Cache::get($usersKey, []);
+        $usersUpdate = [];
+        $difference  = 0;
+        $now         = now();
+
+        foreach ($users as $session => $lastVisit) {
+            if ($now->diffInMinutes($lastVisit) >= 1) {
+                --$difference;
+            } else {
+                $usersUpdate[$session] = $lastVisit;
+            }
+        }
+
+        if (!array_key_exists($sessionId, $users) || $now->diffInMinutes($users[$sessionId]) >= 1) {
+            ++$difference;
+        }
+
+        $usersUpdate[$sessionId] = $now;
+
+        Cache::forever($usersKey, $usersUpdate);
+
+        if (!Cache::has($counterKey)) {
+            Cache::forever($counterKey, 1);
+        } else {
+            Cache::increment($counterKey, $difference);
+        }
+
+        $counter = Cache::get($counterKey);
+
         return view('post.show', [
-            'post' => BlogPost::with('comments')->findOrFail($id),
+            'post'    => $blogPost,
+            'counter' => $counter,
         ]);
     }
 
@@ -117,16 +166,16 @@ class PostController extends Controller
         // {
         //     abort(403, 'You Do Not Have The Permission To Edit This Blog Post');
         // }
-        
+
         $validated = $request->validated();
-        
+
         $post->fill($validated);
         $post->save();
 
         $request->session()->flash('status', 'Blog Post Updated!');
-        
+
         return redirect()->route('post.show', [
-            'post' => $post->id
+            'post' => $post->id,
         ]);
     }
 

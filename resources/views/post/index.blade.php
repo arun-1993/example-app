@@ -36,6 +36,7 @@
         @endif
         
         <div class="mb-3">
+        @auth
         @if (!$post->trashed())
             @can('update', $post)
             <a class="btn btn-primary" href="{{ route('post.edit', ['post' => $post->id]) }}">Edit</a>    
@@ -49,6 +50,7 @@
             </form>
             @endcan
         @endif
+        @endauth
         </div>
     @empty
         <h1>No Posts Found!</h1>
