@@ -7,6 +7,7 @@ use Illuminate\Contracts\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\Cache;
 
 class BlogPost extends Model
 {
@@ -18,6 +19,11 @@ class BlogPost extends Model
     public function user()
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function tags()
+    {
+        return $this->belongsToMany(Tag::class);
     }
 
     public function scopeNewest(Builder $builder)
@@ -38,8 +44,12 @@ class BlogPost extends Model
     public static function boot()
     {
         static::addGlobalScope(new DeletedAdminScope);
-        
+
         parent::boot();
+
+        static::updating(function (BlogPost $blogPost) {
+            Cache::forget("blog-post-{$blogPost->id}");
+        });
 
         static::deleting(function (BlogPost $blogPost) {
             $blogPost->comments()->delete();
