@@ -21,6 +21,11 @@ class BlogPost extends Model
         return $this->belongsTo(User::class);
     }
 
+    public function tags()
+    {
+        return $this->belongsToMany(Tag::class);
+    }
+
     public function scopeNewest(Builder $builder)
     {
         return $builder->orderBy(static::CREATED_AT, 'desc');
@@ -39,7 +44,7 @@ class BlogPost extends Model
     public static function boot()
     {
         static::addGlobalScope(new DeletedAdminScope);
-        
+
         parent::boot();
 
         static::updating(function (BlogPost $blogPost) {
