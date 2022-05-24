@@ -1,8 +1,8 @@
 <?php
 
-use App\Http\Controllers\AboutController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\PostController;
+use App\Http\Controllers\PostTagController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
@@ -15,10 +15,11 @@ use Illuminate\Support\Facades\Route;
 | routes are loaded by the RouteServiceProvider within a group which
 | contains the "web" middleware group. Now create something great!
 |
-*/
+ */
 
 Route::get('/', [HomeController::class, 'home'])->name('home.index');
 Route::get('/contact', [HomeController::class, 'contact'])->name('home.contact');
 Route::get('/secret', [HomeController::class, 'secret'])->name('home.secret')->middleware('can:home.secret');
 Route::resource('post', PostController::class);
+Route::get('/posts/tag/{tag}', [PostTagController::class, 'index'])->name('posts.tags.index');
 Auth::routes();

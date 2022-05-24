@@ -3,32 +3,43 @@
 @section('title', $post->title)
 
 @section('content')
-    <h1>
-        {{ $post->title }}
+<div class="row">
+    <div class="col-8">
+        <h1>
+            {{ $post->title }}
 
-        @badge(['show' => now()->diffInMinutes($post->created_at) < 10080])
-            New!
-        @endbadge
-    </h1>
+            @badge(['show' => now()->diffInMinutes($post->created_at) < 10080])
+                New!
+            @endbadge
+        </h1>
 
-    <p>{{ $post->content }}</p>
-    
-    @updated(['date' => $post->created_at, 'name' => $post->user->name])
-    @endupdated
+        @tags(['tags' => $post->tags])
+        @endtags
 
-    @updated(['date' => $post->updated_at])
-    Updated
-    @endupdated
-
-    <p>Currently being read by {{ $counter }} {{ $counter == 1 ? 'person' : 'people' }}.</p>
-
-    <h4>Comments</h4>
-    @forelse ($post->comments as $comment)
-        <p>{{ $comment->content }}</p>
+        <p>{{ $post->content }}</p>
         
-        @updated(['date' => $comment->created_at])
+        @updated(['date' => $post->created_at, 'name' => $post->user->name])
         @endupdated
-    @empty
-        <p>No Comments Yet!</p>
-    @endforelse
+
+        @updated(['date' => $post->updated_at])
+        Updated
+        @endupdated
+
+        <p>Currently being read by {{ $counter }} {{ $counter == 1 ? 'person' : 'people' }}.</p>
+
+        <h4>Comments</h4>
+        @forelse ($post->comments as $comment)
+            <p>{{ $comment->content }}</p>
+            
+            @updated(['date' => $comment->created_at])
+            @endupdated
+        @empty
+            <p>No Comments Yet!</p>
+        @endforelse
+    </div>
+
+    <div class="col-4">
+        @include('post.partials.activity');
+    </div>
+</div>
 @endsection
