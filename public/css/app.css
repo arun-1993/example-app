@@ -11287,3 +11287,6 @@ textarea.form-control-lg {
     display: none !important;
   }
 }
+.badge-lg {
+  font-size: 1rem;
+}
