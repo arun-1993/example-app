@@ -17,6 +17,11 @@ class Comment extends Model
         return $this->belongsTo(BlogPost::class);
     }
 
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+
     public function scopeNewest(Builder $builder)
     {
         return $builder->orderBy(static::CREATED_AT, 'desc');
