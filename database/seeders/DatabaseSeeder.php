@@ -22,6 +22,8 @@ class DatabaseSeeder extends Seeder
             UsersTableSeeder::class,
             BlogPostsTableSeeder::class,
             CommentsTableSeeder::class,
+            TagsTableSeeder::class,
+            BlogPostTagTableSeeder::class,
         ]);
     }
 }
