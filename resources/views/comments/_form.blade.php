@@ -1,10 +1,10 @@
 <div class="mb-4 mt-4">
 @auth
-    <form action="#" method="POST">
+    <form action="{{ route('post.comments.store', ['post' => $post->id]) }}" method="POST">
         @csrf
-
+        @errors @enderrors
         <div class="form-floating mb-3">
-            <textarea class="form-control" id="content" name="comment" placeholder="Blog Content" style="height: 100px"></textarea>
+            <textarea class="form-control" id="content" name="content" placeholder="Blog Content" style="height: 100px"></textarea>
             <label for="content">Comment</label>
         </div>
 

@@ -32,7 +32,6 @@ class PostController extends Controller
      */
     public function create()
     {
-        // $this->authorize('posts.create');
         return view('post.create');
     }
 
@@ -63,15 +62,7 @@ class PostController extends Controller
      */
     public function show($id)
     {
-        // abort_if(!isset($this->posts[$id]), 404);
-
-        // return view('post.show', [
-        //     'post' => BlogPost::with(['comments' => function ($query) {
-        //         return $query->newest();
-        //     }])->findOrFail($id),
-        // ]);
-
-        $blogPost = Cache::remember("blog-post-{$id}", 60, function () use ($id) {
+        $blogPost = Cache::tags(['blog-post'])->remember("blog-post-{$id}", 60, function () use ($id) {
             return BlogPost::with('comments')->with('Tags')->with('user')->findOrFail($id);
         });
 
@@ -125,10 +116,6 @@ class PostController extends Controller
         $post = BlogPost::findOrFail($id);
 
         $this->authorize('update', $post);
-        // if(Gate::denies('update-post', $post))
-        // {
-        //     abort(403, 'You Do Not Have The Permission To Edit This Blog Post');
-        // }
 
         return view('post.edit', [
             'post' => $post,
