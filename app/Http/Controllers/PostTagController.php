@@ -11,7 +11,7 @@ class PostTagController extends Controller
         $tag = Tag::findOrFail($tag);
 
         return view('post.index', [
-            'posts' => $tag->blogPosts()->latest()->withCount('comments')->with('user')->with('tags')->get(),
+            'posts' => $tag->blogPosts()->latestWithRelations()->get(),
         ]);
     }
 }

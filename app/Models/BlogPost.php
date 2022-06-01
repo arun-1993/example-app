@@ -3,7 +3,6 @@
 namespace App\Models;
 
 use App\Scopes\DeletedAdminScope;
-use Illuminate\Contracts\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -26,19 +25,24 @@ class BlogPost extends Model
         return $this->belongsToMany(Tag::class)->withTimestamps();
     }
 
-    public function scopeNewest(Builder $builder)
+    public function scopeNewest()
     {
-        return $builder->orderBy(static::CREATED_AT, 'desc');
+        return $this->orderBy(static::CREATED_AT, 'desc');
     }
 
-    public function scopeMostCommented(Builder $builder)
+    public function scopeMostCommented()
     {
-        return $builder->withCount('comments')->orderBy('comments_count', 'desc');
+        return $this->withCount('comments')->orderBy('comments_count', 'desc');
     }
 
     public function comments()
     {
         return $this->hasMany(Comment::class)->newest();
+    }
+
+    public function scopeLatestWithRelations()
+    {
+        return $this->latest()->withCount('comments')->with('user')->with('tags');
     }
 
     public static function boot()
