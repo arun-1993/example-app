@@ -3,7 +3,7 @@
 @section('title', 'Create A Post')
 
 @section('content')
-    <form action="{{ route('post.update', ['post' => $post->id]) }}" method="POST">
+    <form action="{{ route('post.update', ['post' => $post->id]) }}" method="POST" enctype="multipart/form-data">
         @csrf
         @method('PUT')
         @include('post.partials.form')

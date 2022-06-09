@@ -22,4 +22,9 @@
     </div>
 @enderror  --}}
 
+<div class="form-floating mb-3">
+    <input class="form-control" type="file" id="thumbnail" name="thumbnail" />
+    <label for="thumbnail">Thumbnail</label>
+</div>
+
 @errors @enderrors
