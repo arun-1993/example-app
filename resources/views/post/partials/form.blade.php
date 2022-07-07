@@ -23,7 +23,7 @@
 @enderror  --}}
 
 <div class="form-floating mb-3">
-    <input class="form-control" type="file" id="thumbnail" name="thumbnail" />
+    <input class="form-control" type="file" id="thumbnail" name="thumbnail" accept="image/*" />
     <label for="thumbnail">Thumbnail</label>
 </div>
 
