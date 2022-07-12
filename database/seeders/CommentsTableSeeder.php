@@ -19,8 +19,8 @@ class CommentsTableSeeder extends Seeder
         $posts = BlogPost::all();
         $users = User::all();
 
-        if ($posts->count() === 0) {
-            $this->command->info('There are no blog posts, so no comments will be created.');
+        if ($posts->count() === 0 || $users->count() === 0) {
+            $this->command->info('There are no blog posts or users, so no comments will be created.');
             return;
         }
 
@@ -28,7 +28,15 @@ class CommentsTableSeeder extends Seeder
 
         Comment::factory($comments)->make()->each(function ($comment) use ($posts, $users) {
             $comment->user_id      = $users->random()->id;
-            $comment->blog_post_id = $posts->random()->id;
+            $comment->commentable_id = $posts->random()->id;
+            $comment->commentable_type = BlogPost::class;
+            $comment->save();
+        });
+
+        Comment::factory($comments)->make()->each(function ($comment) use ($users) {
+            $comment->user_id      = $users->random()->id;
+            $comment->commentable_id = $users->random()->id;
+            $comment->commentable_type = User::class;
             $comment->save();
         });
     }

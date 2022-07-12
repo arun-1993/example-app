@@ -42,7 +42,7 @@ class BlogPost extends Model
 
     public function comments()
     {
-        return $this->hasMany(Comment::class)->newest();
+        return $this->morphMany(Comment::class, 'commentable')->newest();
     }
 
     public function scopeLatestWithRelations()

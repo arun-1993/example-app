@@ -13,11 +13,11 @@ class Comment extends Model
     use HasFactory;
     use SoftDeletes;
 
-    protected $fillable = ['user_id', 'content', 'blog_post_id'];
+    protected $fillable = ['user_id', 'content'];
 
-    public function blogPost()
+    public function commentable()
     {
-        return $this->belongsTo(BlogPost::class);
+        $this->morphTo();
     }
 
     public function user()
@@ -35,8 +35,10 @@ class Comment extends Model
         parent::boot();
 
         static::creating(function (Comment $comment) {
-            Cache::tags(['blog-post'])->forget("blog-post-{$comment->id}");
-            Cache::tags(['blog-post'])->forget('most-commented');
+            if ($comment->commentable_type === BlogPost::class) {
+                Cache::tags(['blog-post'])->forget("blog-post-{$comment->commentable_id}");
+                Cache::tags(['blog-post'])->forget('most-commented');
+            }
         });
 
         // static::addGlobalScope(new LatestScope);
