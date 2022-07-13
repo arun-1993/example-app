@@ -14,6 +14,14 @@ class PostCommentController extends Controller
 
     public function store(BlogPost $post, StoreComment $request)
     {
+        // dd(
+        //     $request->input('content'),
+        //     $request->user()->id,
+        //     $post->comments()->create([
+        //         'content' => 'test',
+        //         // 'user_id' => 1,
+        //     ])
+        // );
         $post->comments()->create([
             'content' => $request->input('content'),
             'user_id' => $request->user()->id,
